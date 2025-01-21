@@ -12,7 +12,7 @@ let titles;
 let lastFetchDate = Date.now();
 
 export default async function handler(req, res) {
-  console.log(getDownloadUrl(articlesPath));
+  throw new Error(getDownloadUrl(articlesPath));
   articles = await fetch(getDownloadUrl(articlesPath)).then((res) =>
     res.json()
   );
