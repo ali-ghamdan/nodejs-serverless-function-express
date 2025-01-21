@@ -1,35 +1,34 @@
+import { put, getDownloadUrl } from "@vercel/blob";
 import fs from "node:fs";
 import os from "node:os";
 import { parseHTML } from "linkedom";
 import path from "node:path";
 import Epub from "epub-gen";
 
-const articlesPath = path.join('./', "articles.json")
+const articlesPath = "articles.json";
 
-let articles = JSON.parse(fs.readFileSync(articlesPath, "utf-8"))
+let articles = await fetch(getDownloadUrl(articlesPath)).then((res) =>
+  res.json()
+);
 const titles = new Set(articles.map((e) => e.title));
 
 let lastFetchDate = Date.now();
 
 export default async function handler(req, res) {
-  let file = await fs.promises.readFile("../file.epub").catch(console.error);
-  if (
-    Date.now() - lastFetchDate > 1 * 1000 * 60 * 60 ||
-    !fs.existsSync("../file.epub")
-  ) {
+  let file = await fetch(getDownloadUrl("file.epub")).then((res) =>
+    res.arrayBuffer()
+  );
+  if (Date.now() - lastFetchDate > 1 * 1000 * 60 * 60 || !file) {
     await scrapeAllArticles();
     articles = articles.sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
     file = await convertToEpub(articles);
-    await fs.promises.writeFile("../file.epub", file);
+    await put("file.epub", file, { access: "public" });
     lastFetchDate = Date.now();
   }
   res.setHeader("Content-Type", "application/epub+zip");
-  res.setHeader(
-    "Content-Disposition",
-    'attachment; filename="file.epub"'
-  );
+  res.setHeader("Content-Disposition", 'attachment; filename="file.epub"');
 
   res.send(file);
 }
@@ -105,10 +104,8 @@ async function scrapeAllArticles() {
   let n = 0;
   do {
     console.log(++n, "fetching..., articles numbers:", articles.length);
-    nextPage = (
-      document.querySelector(
-        "main div nav a.wp-block-query-pagination-next"
-      )
+    nextPage = document.querySelector(
+      "main div nav a.wp-block-query-pagination-next"
     )?.href;
 
     const ArticleList = Array.from(
@@ -135,7 +132,7 @@ async function scrapeAllArticles() {
     }
     console.log(titles.size);
     if (!nextPage) break;
-    html = (await fetchURL(nextPage, 3));
+    html = await fetchURL(nextPage, 3);
     document = parseHTML(html).document;
   } while (typeof nextPage === "string");
 
@@ -159,10 +156,8 @@ function getArticleBasicData(article) {
       ?.getAttribute("datetime")
   );
 
-  const categories = (
-    Array.from(
-      article.querySelectorAll("div.wp-block-post-terms a[rel=tag]")
-    ) 
+  const categories = Array.from(
+    article.querySelectorAll("div.wp-block-post-terms a[rel=tag]")
   ).map((x) => ({ category: x.textContent, url: x.href }));
 
   return { title, url, date, categories };
@@ -175,15 +170,11 @@ async function getArticleData(url, categories, date, title) {
   let content = `${doc.querySelector("main div")}\n${doc.querySelector(
     "main div + div"
   )}`;
-  let tags = (
-    Array.from(
-      doc.querySelectorAll("main .wp-block-post-terms a")
-    )
+  let tags = Array.from(
+    doc.querySelectorAll("main .wp-block-post-terms a")
   ).map((e) => ({ tag: e.textContent, url: e.href }));
-  let related = (
-    Array.from(
-      doc.querySelectorAll("main + div div.wp-block-query ul li a")
-    ) 
+  let related = Array.from(
+    doc.querySelectorAll("main + div div.wp-block-query ul li a")
   ).map((e) => ({ tag: e.textContent, url: e.href }));
 
   articles.push({ title, url, date, content, categories, tags, related });
@@ -199,7 +190,7 @@ async function fetchURL(url, count) {
 
   try {
     return await fetch(url).then((res) => {
-      if (String(res.status)[0] !== '2') throw new Error("Fails")
+      if (String(res.status)[0] !== "2") throw new Error("Fails");
       return res.text();
     });
   } catch (error) {
@@ -209,7 +200,7 @@ async function fetchURL(url, count) {
 }
 
 async function saveArticles() {
-  return fs.promises.writeFile(
+  return await put(
     articlesPath,
     JSON.stringify(
       articles.sort(
@@ -217,7 +208,8 @@ async function saveArticles() {
       ),
       null,
       2
-    )
+    ),
+    { access: "public" }
   );
 }
 
