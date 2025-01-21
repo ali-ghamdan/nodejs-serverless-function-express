@@ -23,7 +23,54 @@ export default async function handler(req, res) {
 
 async function convertToEpub(articles) {
   let sections = articles.map((art, i) => {
-    let document = parseHTML(fs.readFileSync("./index.html", "utf-8")).document;
+    let document = parseHTML(
+      `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مقالات الشيخ أبو جعفر الخليفي</title>
+  <style>
+    .home {
+      font-size: 30px;
+      font-family: Arial, Helvetica, sans-serif;
+      direction: rtl !important;
+      line-height: 45px;
+      padding: 20px;
+      text-decoration: none;
+    }
+    h2 {
+      line-height: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h3></h3>
+  <div class="home">
+    <div class="list">
+      <center>
+        <h1>قائمة المقالات</h1>
+      </center>
+      <hr>
+      <ul class="tree">
+        <!-- <li class="tree-content"></li> -->
+      </ul>
+      <hr>  
+    </div>
+    <div class="articles">
+      <!-- <div class="article">
+        <center>
+          <h2 class="article-title" id="aID"><a href="url">title</a></h2>
+        </center>
+        <div class="article-content">
+          <p></p>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</body>
+</html>`
+    ).document;
     document.querySelector(".list")?.remove();
     let a = document.createElement("div");
     a.classList.add("article");
