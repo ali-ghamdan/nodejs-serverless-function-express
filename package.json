@@ -6,5 +6,11 @@
     "@types/node": "^17.0.42",
     "@vercel/node": "^2.9.6",
     "typescript": "^4.7.3"
+  },
+  "dependencies": {
+    "@types/epub-gen": "^0.1.2",
+    "axios": "^1.7.9",
+    "epub-gen": "^0.1.0",
+    "linkedom": "^0.18.6"
   }
 }
