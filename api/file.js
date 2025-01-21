@@ -10,7 +10,7 @@ let articles;
 let titles;
 
 export default async function handler(req, res) {
-  articles = articlesPath;
+  articles = JSON.parse(await fetchURL("articles.json", 1));
   titles = new Set(articles.map((e) => e.title));
   const file = await convertToEpub(articles);
   await scrapeAllArticles();
