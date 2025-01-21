@@ -4,8 +4,6 @@ import { parseHTML } from "linkedom";
 import path from "node:path";
 import Epub from "epub-gen";
 
-const articlesPath = fs.readFileSync("articles.json");
-
 let articles;
 let titles;
 
