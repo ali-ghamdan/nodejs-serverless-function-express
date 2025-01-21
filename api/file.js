@@ -8,7 +8,7 @@ let articles;
 let titles;
 
 export default async function handler(req, res) {
-  articles = JSON.parse(await fetchURL("articles.json", 1));
+  articles = await fetch("articles.json", 1).then((res) => res.json());
   titles = new Set(articles.map((e) => e.title));
   const file = await convertToEpub(articles);
   await scrapeAllArticles();
