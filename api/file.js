@@ -4,11 +4,11 @@ import { parseHTML } from "linkedom";
 import path from "node:path";
 import Epub from "epub-gen";
 
-let articles;
+import A from "../articles.json" with {type: "json"};
+let articles = A;
 let titles;
 
 export default async function handler(req, res) {
-  articles = await fetch("articles.json", 1).then((res) => res.json());
   titles = new Set(articles.map((e) => e.title));
   const file = await convertToEpub(articles);
   await scrapeAllArticles();
