@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@types/epub-gen": "^0.1.2",
+    "@vercel/blob": "^0.27.1",
     "axios": "^1.7.9",
     "epub-gen": "^0.1.0",
     "linkedom": "^0.18.6"

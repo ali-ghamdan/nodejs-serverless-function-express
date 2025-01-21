@@ -4,7 +4,7 @@ import { parseHTML } from "linkedom";
 import path from "node:path";
 import Epub from "epub-gen";
 
-const articlesPath = path.join(process.cwd(), "articles.json")
+const articlesPath = path.join('./', "articles.json")
 
 let articles = JSON.parse(fs.readFileSync(articlesPath, "utf-8"))
 const titles = new Set(articles.map((e) => e.title));
