@@ -1,4 +1,3 @@
-import axios from "axios";
 import fs from "node:fs";
 import os from "node:os";
 import { parseHTML } from "linkedom";
@@ -93,7 +92,7 @@ async function convertToEpub(articles) {
 }
 
 async function scrapeAllArticles() {
-  let { data: html } = await fetchURL(
+  let html = await fetchURL(
     "https://alkulify.com/%D9%83%D9%84-%D8%A7%D9%84%D9%85%D9%82%D8%A7%D9%84%D8%A7%D8%AA/",
     1
   );
@@ -134,7 +133,7 @@ async function scrapeAllArticles() {
     }
     console.log(titles.size);
     if (!nextPage) break;
-    html = (await fetchURL(nextPage, 3)).data;
+    html = (await fetchURL(nextPage, 3));
     document = parseHTML(html).document;
   } while (typeof nextPage === "string");
 
@@ -168,7 +167,7 @@ function getArticleBasicData(article) {
 }
 
 async function getArticleData(url, categories, date, title) {
-  let { data: html } = await fetchURL(url, 3);
+  let html = await fetchURL(url, 3);
   let doc = parseHTML(html).document;
   doc.querySelector("main > div")?.remove();
   let content = `${doc.querySelector("main div")}\n${doc.querySelector(
@@ -197,7 +196,10 @@ async function fetchURL(url, count) {
   if (typeof count !== "number") count = 0;
 
   try {
-    return await axios.get(url);
+    return await fetch(url).then((res) => {
+      if (String(res.status)[0] !== '2') throw new Error("Fails")
+      return res.text();
+    });
   } catch (error) {
     if (count > 0) return fetchURL(url, count - 1);
     else throw error;
