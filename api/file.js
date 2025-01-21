@@ -1,34 +1,22 @@
-import { put, getDownloadUrl, list } from "@vercel/blob";
 import fs from "node:fs";
 import os from "node:os";
 import { parseHTML } from "linkedom";
 import path from "node:path";
 import Epub from "epub-gen";
 
-const articlesPath = "articles.json";
+const articlesPath = fs.readFileSync("articles.json");
 
 let articles;
 let titles;
-let lastFetchDate = Date.now();
 
 export default async function handler(req, res) {
-  throw new Error(await list());
-  articles = await fetch(getDownloadUrl(articlesPath)).then((res) =>
-    res.json()
-  );
+  articles = articlesPath;
   titles = new Set(articles.map((e) => e.title));
-  let file = await fetch(getDownloadUrl("file.epub")).then((res) =>
-    res.arrayBuffer()
+  const file = await convertToEpub(articles);
+  await scrapeAllArticles();
+  articles = articles.sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-  if (Date.now() - lastFetchDate > 1 * 1000 * 60 * 60 || !file) {
-    await scrapeAllArticles();
-    articles = articles.sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-    file = await convertToEpub(articles);
-    await put("file.epub", file, { access: "public" });
-    lastFetchDate = Date.now();
-  }
   res.setHeader("Content-Type", "application/epub+zip");
   res.setHeader("Content-Disposition", 'attachment; filename="file.epub"');
 
@@ -202,17 +190,7 @@ async function fetchURL(url, count) {
 }
 
 async function saveArticles() {
-  return await put(
-    articlesPath,
-    JSON.stringify(
-      articles.sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      ),
-      null,
-      2
-    ),
-    { access: "public" }
-  );
+  return;
 }
 
 function tmpFile(name = "tmp") {
