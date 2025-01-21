@@ -1,4 +1,4 @@
-import { put, getDownloadUrl } from "@vercel/blob";
+import { put, getDownloadUrl, list } from "@vercel/blob";
 import fs from "node:fs";
 import os from "node:os";
 import { parseHTML } from "linkedom";
@@ -12,7 +12,7 @@ let titles;
 let lastFetchDate = Date.now();
 
 export default async function handler(req, res) {
-  throw new Error(getDownloadUrl(articlesPath));
+  throw new Error(await list());
   articles = await fetch(getDownloadUrl(articlesPath)).then((res) =>
     res.json()
   );
