@@ -4,7 +4,9 @@ import { parseHTML } from "linkedom";
 import path from "node:path";
 import Epub from "epub-gen";
 
-let articles = JSON.parse(fs.readFileSync("./articles.json", "utf-8"))
+const articlesPath = path.join(process.cwd(), "articles.json")
+
+let articles = JSON.parse(fs.readFileSync(articlesPath, "utf-8"))
 const titles = new Set(articles.map((e) => e.title));
 
 let lastFetchDate = Date.now();
@@ -208,7 +210,7 @@ async function fetchURL(url, count) {
 
 async function saveArticles() {
   return fs.promises.writeFile(
-    "./articles.json",
+    articlesPath,
     JSON.stringify(
       articles.sort(
         (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
