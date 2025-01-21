@@ -118,8 +118,7 @@ async function convertToEpub(articles) {
       tocTitle: "فهرس المقالات",
       content: sections,
       appendChapterTitles: false,
-    },
-    out
+    }
   ).promise;
 
   let output = await fs.promises.readFile(out);
@@ -240,7 +239,7 @@ async function saveArticles() {
 
 function tmpFile(name = "tmp") {
   return path.join(
-    os.tmpdir(),
+    "/tmp",
     `${String(Math.random()).replace(".", "")}_${name}`
   );
 }

@@ -12,6 +12,7 @@
     "@vercel/blob": "^0.27.1",
     "axios": "^1.7.9",
     "epub-gen": "^0.1.0",
+    "epub-gen-memory": "^1.1.2",
     "linkedom": "^0.18.6"
   }
 }
