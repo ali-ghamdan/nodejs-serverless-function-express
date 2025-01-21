@@ -118,7 +118,7 @@ async function convertToEpub(articles) {
       tocTitle: "فهرس المقالات",
       content: sections,
       appendChapterTitles: false,
-    }
+    },out
   ).promise;
 
   let output = await fs.promises.readFile(out);
