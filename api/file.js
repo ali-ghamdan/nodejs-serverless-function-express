@@ -7,14 +7,15 @@ import Epub from "epub-gen";
 
 const articlesPath = "articles.json";
 
-let articles = await fetch(getDownloadUrl(articlesPath)).then((res) =>
-  res.json()
-);
-const titles = new Set(articles.map((e) => e.title));
-
+let articles;
+let titles;
 let lastFetchDate = Date.now();
 
 export default async function handler(req, res) {
+  articles = await fetch(getDownloadUrl(articlesPath)).then((res) =>
+    res.json()
+  );
+  titles = new Set(articles.map((e) => e.title));
   let file = await fetch(getDownloadUrl("file.epub")).then((res) =>
     res.arrayBuffer()
   );
